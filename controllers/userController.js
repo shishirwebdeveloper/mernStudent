@@ -1,7 +1,9 @@
 const User = require('../models/userModel');
 
 const createUser = async (req, res) => {
+  
     try {
+        
         const { name, email, address } = req.body;
         const user = new User({
             name: name,
@@ -14,6 +16,7 @@ const createUser = async (req, res) => {
         console
         res.status(400).json({ status: 400, message: 'Record not inserted' });
     }
+
 }
 
 const viewUser = async (req, res) => {
