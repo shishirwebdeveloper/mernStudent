@@ -5,10 +5,12 @@ const createUser = async (req, res) => {
     try {
         
         const { name, email, address } = req.body;
+
         const user = new User({
             name: name,
             email: email,
-            address: address
+            address: address,
+            photo: req.file ? req.file.filename : 'uploads/images/default.png'
         });
         user.save();
         res.status(200).json({ status: 200, message: 'Record inserted' });

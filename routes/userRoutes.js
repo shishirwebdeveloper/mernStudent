@@ -1,4 +1,6 @@
 const router = require('express').Router();
+const multer = require('multer');
+const path = require('path');
 const { createUser, viewUser, viewUserById, updateUser, deleteUser } = require('../controllers/userController');
 const {body, validationResult } = require('express-validator');
 
@@ -16,7 +18,17 @@ const validateBody = [
     body('address').notEmpty().withMessage('Address is required')
 ];
 
-router.post('/create',validateBody,validate,createUser);
+
+const upload = multer({ storage: multer.diskStorage({
+    destination: (req, file, cb) => {   
+        cb(null, 'uploads/images');
+    } ,
+    filename: (req, file, cb) => {          
+        cb(null, Date.now() + path.extname(file.originalname));
+    }   
+}) });
+
+router.post('/create',upload.single('photo'),validateBody,validate,createUser);
 router.get('/list', viewUser);
 router.get('/single/:id', viewUserById); 
 router.put('/update/:id',validateBody,validate,updateUser);
