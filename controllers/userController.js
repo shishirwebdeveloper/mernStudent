@@ -1,17 +1,27 @@
 const User = require('../models/userModel');
+const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
+const dotenv = require('dotenv');
+dotenv.config();
+
 
 const createUser = async (req, res) => {
   
     try {
         
-        const { name, email, address } = req.body;
+        const { name, email, password } = req.body;
 
-        const user = new User({
+        const saltRounds = 10;
+        const hashedPassword = await bcrypt.hash(password, saltRounds);
+
+        const userObj = {
             name: name,
             email: email,
-            address: address,
-            photo: req.file ? req.file.filename : 'uploads/images/default.png'
-        });
+            password: hashedPassword,
+            //photo: req.file ? req.file.filename : 'uploads/images/default.png'
+        }
+
+        const user = new User(userObj);
         user.save();
         res.status(200).json({ status: 200, message: 'Record inserted' });
     } catch (error) {
@@ -19,6 +29,31 @@ const createUser = async (req, res) => {
         res.status(400).json({ status: 400, message: 'Record not inserted' });
     }
 
+}
+
+const loginUser = async (req, res) => {
+    try {                               
+        const { email, password } = req.body;
+        const user = await User.findOne({ email: email });
+
+        if (!user) {
+        return res.status(404).json({ status: 404, message: 'User not found' }); 
+        }
+        else {
+            const isMatch = await bcrypt.compare(password, user.password);
+        if (isMatch) {
+            const payload = {email: user.email, id: user._id};
+            const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '1h' });
+            return res.status(200).json({ status: 200, message: 'Login successful', token:token });
+        } else {    
+            return res.status(200).json({ status: 404, message: 'Wrong password' }); 
+        }
+    }
+    }catch (error) {n
+        res.status(400).json({ status: 400, message: 'Login failed', error: error.message });
+    } 
+
+        
 }
 
 const viewUser = async (req, res) => {
@@ -67,4 +102,4 @@ const deleteUser = async (req, res) => {
     }
 }
 
-module.exports = {createUser,viewUser, viewUserById, updateUser, deleteUser};
+module.exports = {createUser,viewUser, viewUserById, updateUser, deleteUser, loginUser};

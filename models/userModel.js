@@ -4,11 +4,11 @@ const User = mongoose.model('user',
     {
         name: String,
         email: String,
-        address: String,
-        photo: {
-            type: String,
-            default: 'uploads/images/default.png'
-        }
+        password: String,
+        // photo: {
+        //     type: String,
+        //     default: 'uploads/images/default.png'
+        // }
     }
 );
 
