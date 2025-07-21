@@ -13,7 +13,8 @@ app.use(bodyParser.json());
 
 connectDB();
 
-app.use('/api/users', userRoutes);
+// app.use('/api/users', userRoutes);
+app.use('/api/ads', userRoutes);
 
 
 app.listen(process.env.PORT, () => {
